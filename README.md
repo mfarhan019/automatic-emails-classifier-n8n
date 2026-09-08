@@ -1,4 +1,4 @@
-# 📧 Automatic Emails Classifier — n8n Workflow
+# Automatic Emails Classifier — n8n Workflow
 
 An intelligent email management workflow built with n8n that automatically reads your Gmail inbox every 3 hours, classifies each email into one of 8 smart categories using OpenAI GPT-4o-mini, and applies the correct Gmail label — fully automated, zero manual effort.
 
@@ -25,7 +25,7 @@ Gmail Inbox (every 3 hours)
 
 ---
 
-## 🏷️ Categories Classified Automatically
+## Categories Classified Automatically
 
 | Category | Description |
 |---|---|
@@ -40,7 +40,7 @@ Gmail Inbox (every 3 hours)
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 | Tool | Purpose |
 |---|---|
@@ -50,7 +50,7 @@ Gmail Inbox (every 3 hours)
 
 ---
 
-## 🔄 Workflow Overview
+## Workflow Overview
 
 ```
 [Schedule Trigger] → [Gmail: Fetch Emails] → [Edit Fields] → [Text Classifier (AI)]
@@ -62,7 +62,7 @@ Gmail Inbox (every 3 hours)
 
 ---
 
-## 🚀 Setup
+## Setup
 
 ### 1. Import Workflow
 
@@ -112,14 +112,14 @@ Toggle the workflow **Active** in n8n — it will run automatically every 3 hour
 
 ---
 
-## 🎬 Demo Video
+## Demo Video
 
 Demo Video is available on LinkedIn:
 [Watch Here](#) *(add your LinkedIn post link)*
 
 ---
 
-## 💡 Use Cases
+## Use Cases
 
 - **Freelancers** — never miss a client inquiry buried under spam
 - **Small businesses** — auto-sort vendor and customer emails
@@ -128,7 +128,7 @@ Demo Video is available on LinkedIn:
 
 ---
 
-## 🛠️ Customization Ideas
+## Customization Ideas
 
 - Add a **Slack notification** for `urgent_action_required` emails
 - Auto-reply to `business_inquiry` with an acknowledgement
@@ -137,14 +137,8 @@ Demo Video is available on LinkedIn:
 
 ---
 
-## 📄 License
+## License
 
 MIT — free to use and modify.
 
 ---
-
-## 👤 Author
-
-Built by **[Your Name]** — n8n & AI Automation Specialist  
-📧 your@email.com  
-🔗 [LinkedIn](#) | [GitHub](#)
