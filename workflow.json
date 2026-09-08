@@ -1,0 +1,679 @@
+{
+  "name": "Automatic Emails Classifier",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "readStatus": "unread"
+        }
+      },
+      "id": "fc1ba267-4a62-4290-a2d8-80e4fba295bc",
+      "name": "Get many messages",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        672
+      ],
+      "webhookId": "b307c130-d804-4857-a98f-fd80d8bb6487",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ce6ec861-4eb7-491a-a181-046a1b21828e",
+              "name": "snippet",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "7190e9f4-34b6-44e0-8589-24dde7879cb5",
+              "name": "labels",
+              "value": "={{ $json.labels }}",
+              "type": "array"
+            },
+            {
+              "id": "ce01751e-12f8-4866-bcb4-57433e965154",
+              "name": "Subject",
+              "value": "={{ $json.Subject }}",
+              "type": "string"
+            },
+            {
+              "id": "7eaa3f50-852c-49bb-88ed-1b83e49a0ee5",
+              "name": "From",
+              "value": "={{ $json.From }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "07211ea6-fca0-4286-a303-8fe345f9df84",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -576,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}\n{{ $json.labels }}\n{{ $json.Subject }}\n{{ $json.From }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "security_alert",
+              "description": "Account security notifications, sign-in alerts, password reset requests, two-factor/verification codes, account recovery confirmations, or any message from a service warning about account access or changes. These require awareness but not a reply."
+            },
+            {
+              "category": "business_inquiry",
+              "description": "Messages from real clients, leads, prospects, or business contacts related to work — inquiries, orders, project discussions, complaints, or requests that need a human decision or reply. This excludes automated system messages."
+            },
+            {
+              "category": "personal",
+              "description": "One-on-one messages from friends, family, or personal contacts that are informal and unrelated to business or automated services."
+            },
+            {
+              "category": "newsletter_update",
+              "description": "Subscribed content the user opted into — product updates, changelogs, blog digests, educational content, or company announcements from tools/services the user uses. Informational, not promotional selling."
+            },
+            {
+              "category": "promotional_spam",
+              "description": "Marketing emails, sales offers, unsolicited advertising, promotional discounts, or cold outreach trying to sell something. Includes mass-sent commercial content the user did not explicitly request."
+            },
+            {
+              "category": "system_notification",
+              "description": "Automated, non-actionable system messages such as delivery failure/bounce reports, mailer-daemon notices, workflow/automation error alerts, or confirmation receipts from bots."
+            },
+            {
+              "category": "urgent_action_required",
+              "description": "Time-sensitive messages that explicitly require the user to act soon — deadlines, payment due notices, expiring trials, approval requests — regardless of sender type."
+            },
+            {
+              "category": "uncertain",
+              "description": "Use this only when the email content is too short, unclear, or ambiguous to confidently assign any other category."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an email classification assistant. You will be given the subject line, sender, Gmail labels, and a short snippet of an email's content.\n\nClassify the email into exactly ONE of the provided categories based on their descriptions. Use the following priority order when an email could reasonably fit more than one category:\n\n1. If the email explicitly requires the user to take an action with a deadline or time pressure, classify it as urgent_action_required.\n2. If it is a security/account-related system message (sign-in alert, verification code, password reset), classify it as security_alert.\n3. If it is from a real person discussing work, a client matter, or a business request, classify it as business_inquiry.\n4. If it is a personal, informal message from a known individual unrelated to business, classify it as personal.\n5. If it is subscribed informational content (newsletters, product updates) without a sales pitch, classify it as newsletter_update.\n6. If it is unsolicited marketing, advertising, or sales content, classify it as promotional_spam.\n7. If it is an automated, non-actionable system message (delivery failure, bounce, workflow error, bot confirmation), classify it as system_notification.\n8. Only use uncertain if none of the above can be confidently determined from the available information.\n\nBase your decision only on the information provided. Do not guess sender intent beyond what the subject, sender, labels, and snippet indicate. Do not explain your reasoning. Output only the classification result in the required JSON format."
+        }
+      },
+      "id": "c613cc15-0687-47a7-92d5-c3a2b7a52126",
+      "name": "Text Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -352,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "ae091df5-a99c-484f-b999-247aa2a671f9",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        1088
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "n8n credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4587224264847894845"
+        ]
+      },
+      "id": "ba1977c3-4728-4d8d-9ef8-88f0ac8fbc7c",
+      "name": "Label - security_alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        176
+      ],
+      "webhookId": "4b1c48b8-5e67-47f7-a4c8-dab19e293039",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "95247286-fba0-4890-9b8f-3158792bef11",
+      "name": "Mark read - business_inquiry",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        336
+      ],
+      "webhookId": "97adf55d-6760-4834-a28e-b46c8d59da5d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_9215033130003348552"
+        ]
+      },
+      "id": "db91ed22-3f97-400b-aa25-74a954d26e72",
+      "name": "Label - business_inquiry",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        336
+      ],
+      "webhookId": "de54adcc-bb7e-4834-89ac-fea608e84ce5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "595c4134-21be-4410-8aa8-fd384a548c8c",
+      "name": "Mark read - personal",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        480
+      ],
+      "webhookId": "5bfa77cd-48f9-44db-b458-b94f000914d6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_2574396612868446821"
+        ]
+      },
+      "id": "76a5235b-e0c4-474b-b678-773317d378f9",
+      "name": "Label - personal",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        480
+      ],
+      "webhookId": "9ebdf548-c1e8-4f11-975d-2600c9282842",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "4aa3a8e1-8d1f-4328-b365-e5528e831251",
+      "name": "Mark read - newsletter_update",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        624
+      ],
+      "webhookId": "15df7ac7-fc53-4964-bf35-ad6371d22da3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_7644609074961079857"
+        ]
+      },
+      "id": "44895507-2461-48cc-b286-9d9f892e1626",
+      "name": "Label - newsletter_update",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        624
+      ],
+      "webhookId": "14cb6bd8-16f8-4b54-861c-53ee05e6e4ef",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "97622cbb-28e6-4735-aea7-e64731ff02e7",
+      "name": "Mark read - promotional_spam",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        768
+      ],
+      "webhookId": "c990b10b-0982-4793-a920-96092e724758",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4265319078782092707"
+        ]
+      },
+      "id": "984a4226-1304-42ae-9a1c-0cf91a12eb3b",
+      "name": "Label - promotional_spam",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        768
+      ],
+      "webhookId": "c8808aee-118f-42f0-96c4-183aed7a1ff0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "0f378e15-d6dc-4951-8e19-66b807683def",
+      "name": "Mark read - system_notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        944
+      ],
+      "webhookId": "20e0f364-fd66-4825-80a6-8e2913d1d5f3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4606348172548022567"
+        ]
+      },
+      "id": "0ee0e2ee-55f1-44c0-a9d3-dc0272bd22d1",
+      "name": "Label - system_notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        944
+      ],
+      "webhookId": "70219e28-c8a7-4c5f-aa0d-87607db6066b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4954873146516883519"
+        ]
+      },
+      "id": "82bfbe4c-4f9a-48ea-a817-83074ac9f9db",
+      "name": "Label - urgent_action_required",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        1136
+      ],
+      "webhookId": "94e6d5d4-a3b3-478e-abcd-f970144b20fe",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "189314d2-cf87-4653-b831-fc37a2dc4031",
+      "name": "Mark read - uncertain",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        1328
+      ],
+      "webhookId": "5eedb699-ce65-4d1f-81a7-8a68daf8f380",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_4871419294241143760"
+        ]
+      },
+      "id": "21331010-0b85-4b68-9539-950b519a4f0d",
+      "name": "Label - uncertain",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        1328
+      ],
+      "webhookId": "f4ae4e89-d832-44d0-bd17-e1316d84751d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YYn8K89Vn65u9RHW",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1024,
+        672
+      ],
+      "id": "d695ce65-3cde-434b-821e-35b464789e95",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Label - security_alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - business_inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - personal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - newsletter_update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - promotional_spam",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - system_notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label - urgent_action_required",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark read - uncertain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - business_inquiry": {
+      "main": [
+        [
+          {
+            "node": "Label - business_inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - personal": {
+      "main": [
+        [
+          {
+            "node": "Label - personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - newsletter_update": {
+      "main": [
+        [
+          {
+            "node": "Label - newsletter_update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - promotional_spam": {
+      "main": [
+        [
+          {
+            "node": "Label - promotional_spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - system_notification": {
+      "main": [
+        [
+          {
+            "node": "Label - system_notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark read - uncertain": {
+      "main": [
+        [
+          {
+            "node": "Label - uncertain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9bba232f-125f-4d4d-baaf-39d2816f2829",
+  "meta": {
+    "instanceId": "ea6aa7a5c7d36b7704ad7469e8cbfe037f469dd1064e578960a3b1e5e47bb474"
+  },
+  "nodeGroups": [],
+  "id": "T0GXKo21jqDE6ZVQ",
+  "tags": []
+}
