@@ -115,7 +115,7 @@ Toggle the workflow **Active** in n8n — it will run automatically every 3 hour
 ## Demo Video
 
 Demo Video is available on LinkedIn:
-https://shorturl.at/ob2Vq
+- https://www.linkedin.com/posts/muhammad-farhan-automation-expert_automation-aitools-n8n-activity-7503316370416189441-Anqz?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGz7OncBrF9aAry5leKa0S7nGoANBw7vWbk
 
 ---
 
