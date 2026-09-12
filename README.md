@@ -115,7 +115,7 @@ Toggle the workflow **Active** in n8n — it will run automatically every 3 hour
 ## Demo Video
 
 Demo Video is available on LinkedIn:
-[Watch Here](#) *(add your LinkedIn post link)*
+https://shorturl.at/ob2Vq
 
 ---
 
